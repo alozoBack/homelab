@@ -14,7 +14,7 @@
 # Author: alozo (github.com/alozoBack)
 
 # Port for ssh
-$port = 7346
+port = 7346
 
 
 # Update
