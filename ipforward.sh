@@ -15,7 +15,7 @@ echo " /\_/\                                                                    
 echo "( o.o )      ._____________  __________________ __________ __      __  _____ __________________          ( o.o )";
 echo " > ^ <       |   \______   \ \_   _____\_____  \\______   /  \    /  \/  _  \\______   \______ \          > ^ < ";
 echo " /\_/\       |   ||     ___/  |    __)  /   |   \|       _\   \/\/   /  /_\  \|       _/|    |  \         /\_/\ ";
-echo "( o.o )      |   ||    |      |     \  /    |    |    |   \\        /    |    |    |   \|    `   \       ( o.o )";
+echo "( o.o )      |   ||    |      |     \  /    |    |    |   \\        /    |    |    |   \|    |   \       ( o.o )";
 echo " > ^ <       |___||____|      \___  /  \_______  |____|_  / \__/\  /\____|__  |____|_  /_______  /        > ^ < ";
 echo " /\_/\                            \/           \/       \/       \/         \/       \/        \/         /\_/\ ";
 echo "( o.o )                                                                                                  ( o.o )";
@@ -28,11 +28,22 @@ echo ""
 
 echo "Origin IP: "
 read origin
-echo ""
 echo "Destination IP: "
 read dest
-echo ""
 echo "Port: "
 read port
-sudo iptables -t nat -A PREROUTING -p tcp -d $origin --dport $port -j DNAT --to-destination $dest
-sudo iptables -A FORWARD -p tcp -d $dest --dport $port -j ACCEPT
+echo "Protocol(udp/tcp): "
+read protocol
+case $protocol in
+    "tcp")
+    sudo iptables -t nat -A PREROUTING -p tcp -d $origin --dport $port -j DNAT --to-destination $dest ; \
+    sudo iptables -A FORWARD -p tcp -d $dest --dport $port -j ACCEPT
+        ;;
+    "udp")
+    sudo iptables -t nat -A PREROUTING -p udp -d $origin --dport $port -j DNAT --to-destination $dest ; \
+    sudo iptables -A FORWARD -p udp -d $dest --dport $port -j ACCEPT
+        ;;
+        *)
+    echo "invalid"
+    ;;
+esac
