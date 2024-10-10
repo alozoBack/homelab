@@ -36,12 +36,12 @@ echo "Protocol(udp/tcp): "
 read protocol
 case $protocol in
     "tcp")
-    sudo iptables -t nat -A PREROUTING -p tcp -d $origin --dport $port -j DNAT --to-destination $dest ; \
-    sudo iptables -A FORWARD -p tcp -d $dest --dport $port -j ACCEPT
+    sudo iptables -t nat -A PREROUTING -p tcp -d $origin --dport $port -j DNAT --to-destination $dest:$port ; \
+    sudo iptables -A FORWARD -p tcp -d $dest:$port --dport $port -j ACCEPT
         ;;
     "udp")
-    sudo iptables -t nat -A PREROUTING -p udp -d $origin --dport $port -j DNAT --to-destination $dest ; \
-    sudo iptables -A FORWARD -p udp -d $dest --dport $port -j ACCEPT
+    sudo iptables -t nat -A PREROUTING -p udp -d $origin --dport $port -j DNAT --to-destination $dest:$port ; \
+    sudo iptables -A FORWARD -p udp -d $dest --dport $port:$port -j ACCEPT
         ;;
         *)
     echo "invalid"
