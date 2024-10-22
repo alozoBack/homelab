@@ -70,11 +70,11 @@ echo " > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^
 
 
 echo " "
-echo "Packages to install: qumu-guest-agent, parted, ssh, sudo, openssl"
+echo "Packages to install: qumu-guest-agent, parted, ssh, sudo, openssl, docker"
 echo "Enter to continue"
 read
 echo " "
-apt-get install -y qemu-guest-agent parted ssh sudo openssl
+apt-get install -y qemu-guest-agent parted ssh sudo openssl docker
 
 # Resize root partition
 echo " "
