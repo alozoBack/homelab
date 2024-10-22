@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Script for Debian VM installed in ProxMox
 # Script does the following:
 # 1. Installs packages: qemu-guset-agent, parted, ssh, sudo, openssl.
@@ -14,7 +16,7 @@
 # Author: alozo (github.com/alozoBack)
 
 # Port for ssh
-port = 7346
+port=7346
 
 
 # Update
@@ -42,7 +44,7 @@ echo " > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^
 echo "";
 
 
-apt-get update
+apt-get update && apt-get upgrade -y
 
 # Install packages
 echo " "
@@ -74,7 +76,7 @@ echo "Packages to install: qumu-guest-agent, parted, ssh, sudo, openssl, docker"
 echo "Enter to continue"
 read
 echo " "
-apt-get install -y qemu-guest-agent parted ssh sudo openssl docker
+apt-get install -y qemu-guest-agent parted ssh sudo openssl curl
 
 # Resize root partition
 echo " "
@@ -102,10 +104,13 @@ echo " > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^ <  > ^
 echo " "
 
 echo -e "Fix\n1\nYes" | parted /dev/sda  resizepart 1 100% ---pretend-input-tty
+resize2fs /dev/sda1
 
 # Setup sshd daemon
 echo " "
 
+#install docker
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/uuuuuno-devops/home-lab/refs/heads/main/install-docker.sh)"
 
 
 
@@ -133,7 +138,7 @@ Port $port
 PermitRootLogin yes
 PasswordAuthentication no
 PubkeyAuthentication yes
-AuthorizedKeysFile	.ssh/authorized_keys
+AuthorizedKeysFile .ssh/authorized_keys
 MaxAuthTries 3
 MaxSessions 2
 " > /etc/ssh/sshd_config.d/proxmox.conf
@@ -169,27 +174,23 @@ echo "%sdwhl ALL=(ALL:ALL) ALL" > /etc/sudoers.d/sdwhl
 chmod 440 /etc/sudoers.d/sdwhl
 
 # Create user
-echo " "
-echo "Write username: "
-read username
+echo ""
+read -p "Enter username: " username
 useradd -m -s /bin/bash -G sdwhl,docker $username
     #Set password
-    password=$(openssl rand -hex 6)
-    echo "$username:$password" | chpasswd
-    echo "Password for $username is: $password"
+password=$(openssl rand -hex 6)
+echo "$username:$password" | chpasswd
+echo "Password for $username is: $password"
 
 # Add to user ssh authorized keys
 mkdir -p /home/$username/.ssh
 chmod 700 /home/$username/.ssh
-echo " "
-echo "Write ssh public key: "
-read sshkey
-echo $sshkey >> /home/$username/.ssh/authorized_keys
+read -p "Enter SSH public key: " sshkey
+echo "$sshkey" > /home/$username/.ssh/authorized_keys
 chown -R $username:$username /home/$username/.ssh
+chmod 600 /home/$username/.ssh/authorized_keys
 
-# Install docker
-echo ""
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/uuuuuno-devops/home-lab/refs/heads/main/install-docker.sh)"
+
 
 # Print new password
-echo "Password for $username is: $password"
+echo "Setup complete. The password for $username is: $password"
